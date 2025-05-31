@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useRef, useEffect } from "react";
+import Grafico from "./components/grafico.tsx";
+import Tabela from "./components/tabela.tsx";
+import PDFReport from "./components/PDFReport.tsx";
+import * as htmlToImage from "html-to-image";
 
 function App() {
-  const [count, setCount] = useState(0)
+ const chartRef = useRef<HTMLDivElement>(null);
+  const [ImageData, setImageData] = useState<string | null>(null);
+
+  const gerarImagem = async () => {
+    if (chartRef.current) {
+      const dataUrl = await htmlToImage.toPng(chartRef.current);
+      setImageData(dataUrl);
+    }
+  };
+
+  useEffect(() => {
+    gerarImagem();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div>
+      <h2>Visualização</h2>
+      {/* Passar chartRef como ref de div, não como prop */}
+      <div ref={chartRef}>
+        <Grafico ref={chartRef} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+      <Tabela />
+
+      <div style={{ marginTop: "2rem" }}>
+        {ImageData && <PDFReport imageData={ImageData} />}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
