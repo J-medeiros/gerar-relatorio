@@ -5,7 +5,7 @@ import PDFReport from "./components/PDFReport.tsx";
 import * as htmlToImage from "html-to-image";
 
 function App() {
- const chartRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
   const [ImageData, setImageData] = useState<string | null>(null);
 
   const gerarImagem = async () => {
@@ -16,9 +16,14 @@ function App() {
   };
 
   useEffect(() => {
-    gerarImagem();
-  }, []);
+    // Aguarda 500ms para garantir que o gráfico foi renderizado
+    const timeout = setTimeout(() => {
+      gerarImagem();
+    }, 500);
 
+    return () => clearTimeout(timeout);
+  }, []);
+  
   return (
     <div>
       <h2>Visualização</h2>
